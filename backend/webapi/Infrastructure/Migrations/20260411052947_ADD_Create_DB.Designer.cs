@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using webapi.Database;
+using webapi.Infrastructure.Database;
 
 #nullable disable
 
@@ -25,7 +25,7 @@ namespace webapi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("webapi.Database.Models.Message", b =>
+            modelBuilder.Entity("webapi.Database.Models.MessageDBE", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace webapi.Migrations
                     b.ToTable("MESSAGE", (string)null);
                 });
 
-            modelBuilder.Entity("webapi.Database.Models.User", b =>
+            modelBuilder.Entity("webapi.Database.Models.UserDBE", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,9 +83,9 @@ namespace webapi.Migrations
                     b.ToTable("USER", (string)null);
                 });
 
-            modelBuilder.Entity("webapi.Database.Models.Message", b =>
+            modelBuilder.Entity("webapi.Database.Models.MessageDBE", b =>
                 {
-                    b.HasOne("webapi.Database.Models.User", "Sender")
+                    b.HasOne("webapi.Database.Models.UserDBE", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -95,7 +95,7 @@ namespace webapi.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("webapi.Database.Models.User", b =>
+            modelBuilder.Entity("webapi.Database.Models.UserDBE", b =>
                 {
                     b.Navigation("Messages");
                 });

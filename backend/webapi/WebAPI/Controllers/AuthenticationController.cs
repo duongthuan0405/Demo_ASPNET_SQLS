@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace webapi.Controllers
+namespace webapi.WebAPI.Controllers
 {
     [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
+        
     }
 }

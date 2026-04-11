@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using webapi.Database.Models;
+using webapi.Infrastructure.Database.Models;
 
-namespace webapi.Database
+namespace webapi.Infrastructure.Database
 {
     public class MyAppDbContext : DbContext
     {
         public MyAppDbContext(DbContextOptions options) : base(options) { }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Message> Messages { get; set; }
+        public DbSet<UserDBE> Users { get; set; }
+        public DbSet<MessageDBE> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

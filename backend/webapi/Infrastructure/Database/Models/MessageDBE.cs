@@ -1,6 +1,6 @@
-﻿namespace webapi.Database.Models
+﻿namespace webapi.Infrastructure.Database.Models
 {
-    public class Message
+    public class MessageDBE
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; } = Guid.Empty;
@@ -8,7 +8,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; } = null;
 
-        public User Sender { get; set; } = null!;
+        public UserDBE Sender { get; set; } = null!;
 
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using webapi.Database.Models;
+using webapi.Infrastructure.Database.Models;
 
-namespace webapi.Database.Configurations
+namespace webapi.Infrastructure.Database.Configurations
 {
-    public class MessageConfiguration : IEntityTypeConfiguration<Message>
+    public class MessageConfiguration : IEntityTypeConfiguration<MessageDBE>
     {
-        public void Configure(EntityTypeBuilder<Message> builder)
+        public void Configure(EntityTypeBuilder<MessageDBE> builder)
         {
             builder.ToTable("MESSAGE");
 
@@ -24,7 +24,7 @@ namespace webapi.Database.Configurations
                    .HasColumnName("UpdatedAt")
                    .HasColumnType("DATETIME");
 
-            builder.HasOne<User>(x => x.Sender)
+            builder.HasOne(x => x.Sender)
                    .WithMany(sender => sender.Messages)
                    .HasForeignKey(x => x.UserId)
                    .HasConstraintName("FK_Message_User");

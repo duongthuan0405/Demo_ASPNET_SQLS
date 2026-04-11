@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using webapi.Database.Models;
+using webapi.Infrastructure.Database.Models;
 
-namespace webapi.Database.Configurations
+namespace webapi.Infrastructure.Database.Configurations
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    public class UserConfiguration : IEntityTypeConfiguration<UserDBE>
     {
-        public void Configure(EntityTypeBuilder<User> builder)
+        public void Configure(EntityTypeBuilder<UserDBE> builder)
         {
             builder.ToTable("USER");
 
@@ -27,7 +27,7 @@ namespace webapi.Database.Configurations
             builder.Property(x => x.FullName)
                    .HasMaxLength(100)
                    .HasColumnName("FullName")
-                   .HasColumnType("NVARCHAR(100)");
+                   .HasColumnType("NVARCHAR(50)");
         }
     }
 }
