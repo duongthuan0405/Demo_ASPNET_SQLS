@@ -4,13 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using webapi.Application.Repositories;
-using webapi.Application.Services.Jwt;
-using webapi.Application.Services.UnitOfWorks;
+using webapi.Application.Services;
 using webapi.Application.UseCases.Base;
+using webapi.Application.UseCases.GetAllMessages;
+using webapi.Application.UseCases.SendMessage;
 using webapi.Application.UseCases.SignIn;
+using webapi.Application.UseCases.SignUp;
+using webapi.Infrastructure.ConfigurationOptions;
 using webapi.Infrastructure.Database;
-using webapi.Infrastructure.Services.Jwt;
-using webapi.Infrastructure.Services.UnitOfWork;
+using webapi.Infrastructure.Repositories;
+using webapi.Infrastructure.Services;
+using webapi.WebAPI.Middlewares;
 using webapi.WebAPI.SignalRHubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,12 +26,22 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<MyAppDbContext>(opt => opt.UseSqlServer(builder.Configuration["ConnectionStrings:Default"]));
 
 builder.Services.AddScoped<ISignInUC, SignInUC>();
-builder.Services.AddScoped<ISignInUC, SignInUC>();
+builder.Services.AddScoped<ISignUpUC, SignUpUC>();
+builder.Services.AddScoped<ISendMessageUC, SendMessageUC>();
+builder.Services.AddScoped<IGetAllMessagesUC, GetAllMessagesUC>();
 
 builder.Services.AddScoped<IUnitOfWorks, UnitOfWorks>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
-builder.Services.AddScoped<IUserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageRealtimeService, MessageRealtimeService>();
+
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+builder.Services.AddScoped<GlobalExceptionHandlerMiddleware>();
+
+builder.Services.AddSignalR();
 
 
 
@@ -56,6 +70,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -85,5 +100,8 @@ using (var scope = app.Services.CreateScope())
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 app.MapHub<ChatHub>("/chat");
+app.MapControllers();
 app.Run();

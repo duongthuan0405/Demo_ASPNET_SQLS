@@ -1,6 +1,6 @@
 ﻿using webapi.Entities;
 
-namespace webapi.Application.Services.Jwt
+namespace webapi.Application.Services
 {
     public interface IJwtService
     {

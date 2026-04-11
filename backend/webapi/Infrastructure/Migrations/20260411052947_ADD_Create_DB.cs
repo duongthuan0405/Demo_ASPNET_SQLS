@@ -49,7 +49,7 @@ namespace webapi.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MESSAGE_UserId",
                 table: "MESSAGE",
-                column: "UserId");
+                column: "SenderId");
         }
 
         /// <inheritdoc />

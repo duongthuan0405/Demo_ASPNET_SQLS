@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using webapi.Application.Services.UnitOfWorks;
+using webapi.Application.Services;
 using webapi.Infrastructure.Database;
 
-namespace webapi.Infrastructure.Services.UnitOfWork
+namespace webapi.Infrastructure.Services
 {
     public class UnitOfWorks : IUnitOfWorks
     {

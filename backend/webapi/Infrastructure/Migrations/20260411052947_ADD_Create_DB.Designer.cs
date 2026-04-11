@@ -44,12 +44,12 @@ namespace webapi.Migrations
                         .HasColumnType("DATETIME")
                         .HasColumnName("UpdatedAt");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SenderId");
 
                     b.ToTable("MESSAGE", (string)null);
                 });
@@ -87,7 +87,7 @@ namespace webapi.Migrations
                 {
                     b.HasOne("webapi.Database.Models.UserDBE", "Sender")
                         .WithMany("Messages")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_Message_User");

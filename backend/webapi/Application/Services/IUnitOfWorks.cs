@@ -1,4 +1,4 @@
-﻿namespace webapi.Application.Services.UnitOfWorks
+﻿namespace webapi.Application.Services
 {
     public interface IUnitOfWorks
     {

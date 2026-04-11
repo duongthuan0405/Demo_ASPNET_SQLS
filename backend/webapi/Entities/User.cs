@@ -14,7 +14,7 @@
             set => _id = value;
         }
 
-        public string UserName
+        public string Username
         {
             get => _username;
             set => _username = value;

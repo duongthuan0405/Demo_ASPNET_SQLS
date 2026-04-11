@@ -3,11 +3,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using webapi.Application.Services.Jwt;
+using webapi.Application.Services;
 using webapi.Entities;
 using webapi.Infrastructure.ConfigurationOptions;
 
-namespace webapi.Infrastructure.Services.Jwt
+namespace webapi.Infrastructure.Services
 {
     public class JwtService : IJwtService
     {

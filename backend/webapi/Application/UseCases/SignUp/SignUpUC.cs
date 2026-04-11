@@ -1,6 +1,6 @@
 ﻿using webapi.Application.BusinessExceptions;
 using webapi.Application.Repositories;
-using webapi.Application.Services.UnitOfWorks;
+using webapi.Application.Services;
 using webapi.Entities;
 
 namespace webapi.Application.UseCases.SignUp
@@ -25,7 +25,7 @@ namespace webapi.Application.UseCases.SignUp
             var user = new User
             {
                 FullName = input.FullName,
-                UserName = input.Username,
+                Username = input.Username,
                 Password = input.Password
             };
 

@@ -1,7 +1,7 @@
 ﻿
 using webapi.Application.BusinessExceptions;
 using webapi.Application.Repositories;
-using webapi.Application.Services.Jwt;
+using webapi.Application.Services;
 using webapi.Entities;
 
 namespace webapi.Application.UseCases.SignIn
@@ -32,7 +32,7 @@ namespace webapi.Application.UseCases.SignIn
             // 3. Check tồn tại & password
             if (user == null || user.Password != input.Password)
             {
-                throw new InvalidUseCasesInputException(
+                throw new UnauthorizedException(
                     "Username or password is incorrect",
                     null);
             }
@@ -42,9 +42,6 @@ namespace webapi.Application.UseCases.SignIn
             // 4. Map output
             return new SignInUCOutput
             {
-                UserId = user.Id,
-                Username = user.UserName,
-                FullName = user.FullName,
                 Token = jwtToken
             };
         }
