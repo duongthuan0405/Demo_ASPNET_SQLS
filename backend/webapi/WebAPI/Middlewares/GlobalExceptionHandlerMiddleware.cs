@@ -10,6 +10,7 @@ namespace webapi.WebAPI.Middlewares
         {
             try
             {
+                await Task.Delay(1000);
                 await next.Invoke(context);
             }
             catch (Exception ex)
@@ -23,10 +24,12 @@ namespace webapi.WebAPI.Middlewares
                         var errorResponse = new ErrorResponse
                         {
                             Message = invalidInputEx.Message,
-                            Errors = invalidInputEx.GetErrors()
+                            Errors = invalidInputEx.GetErrors(),
+                            StatusCode = 400
                         };
                         await context.Response.WriteAsJsonAsync(errorResponse);
                     }
+
                     else if(ex is UnauthorizedException unauthorizedEx)
                     {
                         context.Response.StatusCode = 401;
@@ -34,7 +37,20 @@ namespace webapi.WebAPI.Middlewares
                         var errorResponse = new ErrorResponse
                         {
                             Message = ex.Message,
-                            Errors = unauthorizedEx.GetErrors()
+                            Errors = unauthorizedEx.GetErrors(),
+                            StatusCode = 401
+                        };
+                        await context.Response.WriteAsJsonAsync(errorResponse);
+                    }
+                    else if (ex is ConflictUniqueValueException conflictUniqueValueEx)
+                    {
+                        context.Response.StatusCode = 429;
+                        context.Response.ContentType = "application/json";
+                        var errorResponse = new ErrorResponse
+                        {
+                            Message = conflictUniqueValueEx.Message,
+                            Errors = conflictUniqueValueEx.GetErrors(),
+                            StatusCode = 429
                         };
                         await context.Response.WriteAsJsonAsync(errorResponse);
                     }
@@ -45,7 +61,8 @@ namespace webapi.WebAPI.Middlewares
                         var errorResponse = new ErrorResponse
                         {
                             Message = "An unexpected error occurred.",
-                            Errors = businessEx.GetErrors() 
+                            Errors = businessEx.GetErrors(),
+                            StatusCode = 500
                         };
                         await context.Response.WriteAsJsonAsync(errorResponse);
                     }
@@ -57,7 +74,8 @@ namespace webapi.WebAPI.Middlewares
                     var errorResponse = new ErrorResponse
                     {
                         Message = "An unexpected error occurred.",
-                        Errors = null
+                        Errors = null,
+                        StatusCode = 500
                     };
                     await context.Response.WriteAsJsonAsync(errorResponse);
                 }

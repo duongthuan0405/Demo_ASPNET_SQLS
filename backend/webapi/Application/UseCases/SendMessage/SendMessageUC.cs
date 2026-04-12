@@ -49,10 +49,7 @@ namespace webapi.Application.UseCases.SendMessage
             // 4. Map output
             var output = new SendMessageUCOutput
             {
-                MessageId = id,
-                UserId = message.UserId,
-                Content = message.Content,
-                CreatedAt = message.CreatedAt
+                Id = id,
             };
 
             // 5. Broadcast realtime

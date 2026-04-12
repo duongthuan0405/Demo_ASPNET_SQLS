@@ -23,7 +23,7 @@ namespace webapi.Application.UseCases.GetAllMessages
                 SenderId = m.UserId,
                 Content = m.Content,
                 CreatedAt = m.CreatedAt,
-                Senders = new UserResponse
+                Sender = new UserResponse
                 {
                     Id = m.Sender.Id,
                     FullName = m.Sender.FullName,

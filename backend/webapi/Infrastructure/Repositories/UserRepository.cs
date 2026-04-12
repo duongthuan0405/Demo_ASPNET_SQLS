@@ -28,6 +28,21 @@ namespace webapi.Infrastructure.Repositories
             return dbe.Id;
         }
 
+        public async Task<User?> GetByIdAsync(Guid userId)
+        {
+            var dbe = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (dbe == null) return null;
+
+            return new User
+            {
+                Id = dbe.Id,
+                Username = dbe.Username,
+                Password = dbe.Password,
+                FullName = dbe.FullName
+            };
+        }
+
         public async Task<User?> GetByUsernameAsync(string username)
         {
             var dbe = await _dbContext.Users.FirstOrDefaultAsync(x => x.Username == username);

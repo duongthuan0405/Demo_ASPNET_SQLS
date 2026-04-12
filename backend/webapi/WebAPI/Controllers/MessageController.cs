@@ -8,7 +8,7 @@ using webapi.WebAPI.DTOs;
 
 namespace webapi.WebAPI.Controllers
 {
-    [Route("api/messages")]
+    [Route("/api/messages")]
     [ApiController]
     public class MessageController : ControllerBase
     {

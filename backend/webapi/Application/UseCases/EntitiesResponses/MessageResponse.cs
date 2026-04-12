@@ -8,6 +8,6 @@
         public DateTime? LastUpdatedAt { get; set; } = null;
         public Guid SenderId { get; set; } = Guid.Empty;
 
-        public UserResponse Senders { get; set; } = null!;
+        public UserResponse Sender { get; set; } = null!;
     }
 }

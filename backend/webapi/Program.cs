@@ -7,6 +7,7 @@ using webapi.Application.Repositories;
 using webapi.Application.Services;
 using webapi.Application.UseCases.Base;
 using webapi.Application.UseCases.GetAllMessages;
+using webapi.Application.UseCases.GetMe;
 using webapi.Application.UseCases.SendMessage;
 using webapi.Application.UseCases.SignIn;
 using webapi.Application.UseCases.SignUp;
@@ -29,6 +30,7 @@ builder.Services.AddScoped<ISignInUC, SignInUC>();
 builder.Services.AddScoped<ISignUpUC, SignUpUC>();
 builder.Services.AddScoped<ISendMessageUC, SendMessageUC>();
 builder.Services.AddScoped<IGetAllMessagesUC, GetAllMessagesUC>();
+builder.Services.AddScoped<IGetUserByIdUC, GetUserByIdUC>();
 
 builder.Services.AddScoped<IUnitOfWorks, UnitOfWorks>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -42,8 +44,6 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<GlobalExceptionHandlerMiddleware>();
 
 builder.Services.AddSignalR();
-
-
 
 var jwt = builder.Configuration.GetSection("Jwt");
 
@@ -69,6 +69,19 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 
 builder.Services.AddControllers();
 
@@ -96,6 +109,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "Database connect failed!");
     }
 }
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

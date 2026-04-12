@@ -22,14 +22,21 @@ namespace webapi.Application.UseCases.SignUp
                 throw new InvalidUseCasesInputException("Invalid input", errors);
             }
 
-            var user = new User
+            var newUser = new User
             {
                 FullName = input.FullName,
                 Username = input.Username,
                 Password = input.Password
             };
-
-            Guid userId = await _userRepository.AddAsync(user);
+            User? user = await _userRepository.GetByUsernameAsync(input.Username);
+            if(user != null)
+            {
+                throw new ConflictUniqueValueException("Username already exists", new()
+                {
+                    { "Username", new() {"Username already exists" } }
+                });
+            }
+            Guid userId = await _userRepository.AddAsync(newUser);
             await _unitOfWorks.FinishTransaction();
             return new SignUpUCOutput
             {
