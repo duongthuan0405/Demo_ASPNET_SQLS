@@ -6,18 +6,22 @@ namespace webapi.WebAPI.Middlewares
 {
     public class GlobalExceptionHandlerMiddleware : IMiddleware
     {
+        private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
+        public GlobalExceptionHandlerMiddleware(ILogger<GlobalExceptionHandlerMiddleware> logger)
+        {
+            _logger = logger;
+        }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             try
             {
-                await Task.Delay(1000);
                 await next.Invoke(context);
             }
             catch (Exception ex)
             {
-                if(ex is BusinessException businessEx)
+                if (ex is BusinessException businessEx)
                 {
-                    if(ex is InvalidUseCasesInputException invalidInputEx)
+                    if (ex is InvalidUseCasesInputException invalidInputEx)
                     {
                         context.Response.StatusCode = 400;
                         context.Response.ContentType = "application/json";
@@ -30,7 +34,7 @@ namespace webapi.WebAPI.Middlewares
                         await context.Response.WriteAsJsonAsync(errorResponse);
                     }
 
-                    else if(ex is UnauthorizedException unauthorizedEx)
+                    else if (ex is UnauthorizedException unauthorizedEx)
                     {
                         context.Response.StatusCode = 401;
                         context.Response.ContentType = "application/json";
@@ -79,6 +83,8 @@ namespace webapi.WebAPI.Middlewares
                     };
                     await context.Response.WriteAsJsonAsync(errorResponse);
                 }
+
+                _logger.LogError(ex, ex.Message);
             }
         }
     }

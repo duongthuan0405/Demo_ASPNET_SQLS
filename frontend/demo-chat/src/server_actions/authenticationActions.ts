@@ -55,3 +55,7 @@ export const signUpAsync = async function (params: {
     };
   }
 };
+
+export const signOutAsync = async function () {
+  (await cookies()).delete("token");
+};

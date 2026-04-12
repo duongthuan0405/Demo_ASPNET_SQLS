@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signInAsync } from "@/server_actions/authenticationActions";
 import { ErrorResponse } from "@/server_actions/ServerActionResult";
+import { getMeAsync } from "@/server_actions/userAction";
 
 export default function SignIn() {
   const [username, setUsername]: [
@@ -52,6 +53,7 @@ export default function SignIn() {
       } else {
         const error: ErrorResponse = res.response as ErrorResponse;
         setBadRequestErrors(error.errors);
+        setError(error.message);
       }
     } catch (error) {
       console.log("Sign-in failed:", error);

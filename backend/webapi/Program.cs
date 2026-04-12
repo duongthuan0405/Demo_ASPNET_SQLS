@@ -116,6 +116,6 @@ app.UseAuthorization();
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
-app.MapHub<ChatHub>("/chat");
+app.MapHub<ChatHub>("/signalr-hub/chat");
 app.MapControllers();
 app.Run();

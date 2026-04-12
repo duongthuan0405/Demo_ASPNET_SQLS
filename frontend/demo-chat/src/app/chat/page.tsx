@@ -4,49 +4,82 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import handleApiError from "@/errors/AppError";
 import {
   getAllMessagesAsync,
   Message,
   sendMessageAsync,
 } from "@/server_actions/messageAction";
-import { getMe } from "@/server_actions/userAction";
+import { getMeAsync, User } from "@/server_actions/userAction";
+import { ErrorResponse } from "@/server_actions/ServerActionResult";
+import createChatHubConnection from "@/signalr/signalRConnection";
+import { HubConnection } from "@microsoft/signalr";
+import { signOutAsync } from "@/server_actions/authenticationActions";
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
   useEffect(() => {
     const authAndFetch = async function () {
       try {
-        const me = await getMe();
-        if (me == null) {
+        const me = await getMeAsync();
+        if (!me.isSuccess || me.response == null) {
           console.error("Current User is null");
           router.replace("/sign-in");
+          return;
         }
 
-        const messagesRes = await getAllMessagesAsync();
-        setMessages(messagesRes.messages);
-      } catch (error: unknown) {
-        const appError = handleApiError(error);
-        if (appError.statusCode == 401 || appError.statusCode == 403) {
-          router.replace("/sign-in");
-          console.error(appError);
+        setCurrentUser(me.response as User);
+        const res = await getAllMessagesAsync();
+        if (res.isSuccess) {
+          const response = res.response as { messages: Message[] };
+          setMessages(response.messages);
+        } else {
+          const error = res.response as ErrorResponse;
+          if (error.statusCode == 401) {
+            router.replace("/sign-in");
+          } else {
+            console.error(error.message, error);
+          }
         }
+      } catch (error: unknown) {
+        console.error("Unknown Error", error);
       }
     };
 
     authAndFetch();
   }, []);
 
-  // 🔥 Scroll bottom
+  useEffect(function () {
+    let chatHubConnection: HubConnection;
+
+    const connectToChatHub = async function () {
+      try {
+        chatHubConnection = createChatHubConnection();
+
+        chatHubConnection.start();
+        chatHubConnection.on("ReceiveMessage", function (message: Message) {
+          setMessages((prev) => [...prev, message]);
+        });
+
+        return chatHubConnection;
+      } catch (error) {
+        console.error("Failed to connect Chat hub");
+      }
+    };
+
+    connectToChatHub();
+
+    return function () {
+      chatHubConnection.stop();
+    };
+  }, []);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -57,7 +90,6 @@ export default function Chat() {
 
     try {
       setLoading(true);
-
       const res = await sendMessageAsync({
         content: newMessage,
       });
@@ -70,9 +102,13 @@ export default function Chat() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.replace("/sign-in");
+  const handleLogout = async () => {
+    try {
+      await signOutAsync();
+      router.replace("/sign-in");
+    } catch (error) {
+      console.error("Log out failed", error);
+    }
   };
 
   return (
@@ -80,7 +116,8 @@ export default function Chat() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4 flex justify-between">
         <h1>Chat Forum</h1>
-        <Button onClick={handleLogout}>Logout</Button>
+        <h1 className="font-extrabold">{currentUser?.fullName ?? "No Name"}</h1>
+        <Button onClick={handleLogout}>Sign Out</Button>
       </div>
 
       {/* Messages */}
@@ -89,6 +126,9 @@ export default function Chat() {
           <div key={m.id} className="bg-white p-3 rounded border">
             <div className="text-sm text-gray-500">{m.sender.fullName}</div>
             <div>{m.content}</div>
+            <div className="text-[12px] text-gray-400">
+              {new Date(m.createdAt).toLocaleString()}
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />

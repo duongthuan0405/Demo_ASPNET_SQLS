@@ -8,8 +8,8 @@ export interface Message {
   id: string;
   content: string;
   senderId: string;
-  createdAt: Date;
-  lastUpdatedAt: Date;
+  createdAt: string;
+  lastUpdatedAt: string;
   sender: {
     id: string;
     username: string;
@@ -43,9 +43,7 @@ export const sendMessageAsync = async (params: {
   content: string;
 }): Promise<ServerActionResult<{ id: string }>> => {
   try {
-    const res: { id: string } = await axiosClient.post("/api/messages", {
-      params,
-    });
+    const res: { id: string } = await axiosClient.post("/api/messages", params);
 
     return {
       isSuccess: true,

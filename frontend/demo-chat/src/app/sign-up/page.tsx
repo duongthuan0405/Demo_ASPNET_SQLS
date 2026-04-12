@@ -8,6 +8,9 @@ import handleApiError from "@/errors/AppError";
 import Link from "next/link";
 import { signUpAsync } from "@/server_actions/authenticationActions";
 import { ErrorResponse } from "@/server_actions/ServerActionResult";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -21,6 +24,8 @@ export default function SignUp() {
     any,
     Dispatch<SetStateAction<any>>,
   ] = useState({});
+
+  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +41,8 @@ export default function SignUp() {
       });
 
       if (res.isSuccess) {
+        toast("Sign up successfully");
+        router.push("/sign-in");
       } else {
         const error: ErrorResponse = res.response as ErrorResponse;
         setBadRequestError(error.errors);
@@ -57,8 +64,6 @@ export default function SignUp() {
 
     const newUser = { username, password, fullname };
     users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
   };
 
   return (

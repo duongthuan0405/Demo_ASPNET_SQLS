@@ -9,13 +9,13 @@ export interface User {
   username: string;
 }
 
-export async function getMe(): Promise<ServerActionResult<User>> {
+export async function getMeAsync(): Promise<ServerActionResult<User>> {
   try {
-    const res: User = await axiosClient.get("/api/users/me");
+    const res: { user: User } = await axiosClient.get("/api/users/me");
 
     return {
       isSuccess: true,
-      response: res,
+      response: res.user,
     };
   } catch (error) {
     const appError: AppError = handleApiError(error);

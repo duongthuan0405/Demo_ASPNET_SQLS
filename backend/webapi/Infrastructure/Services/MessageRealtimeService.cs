@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using webapi.Application.Services;
-using webapi.Application.UseCases.SendMessage;
+using webapi.Application.UseCases.EntitiesResponses;
+using webapi.Entities;
 using webapi.WebAPI.SignalRHubs;
 
 namespace webapi.Infrastructure.Services
@@ -14,9 +15,22 @@ namespace webapi.Infrastructure.Services
             _hub = hub;
         }
 
-        public async Task BroadcastMessageAsync(SendMessageUCOutput message)
+        public async Task BroadcastMessageAsync(Message message)
         {
-            await _hub.Clients.All.SendAsync("ReceiveMessage", message);
+            MessageResponse messageResponse = new MessageResponse()
+            {
+                Id = message.Id,
+                Content = message.Content,
+                CreatedAt = message.CreatedAt,
+                SenderId = message.UserId,
+                Sender = new()
+                {
+                    Id = message.Sender.Id,
+                    Username = message.Sender.Username,
+                    FullName = message.Sender.FullName,
+                }
+            };
+            await _hub.Clients.All.SendAsync("ReceiveMessage", messageResponse);
         }
     }
 }

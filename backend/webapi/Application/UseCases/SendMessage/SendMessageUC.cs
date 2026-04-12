@@ -52,8 +52,10 @@ namespace webapi.Application.UseCases.SendMessage
                 Id = id,
             };
 
+            message.Id = id;
+
             // 5. Broadcast realtime
-            await _realtime.BroadcastMessageAsync(output);
+            await _realtime.BroadcastMessageAsync(message);
 
             return output;
         }

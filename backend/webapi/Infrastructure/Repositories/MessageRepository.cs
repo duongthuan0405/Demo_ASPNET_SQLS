@@ -27,6 +27,15 @@ namespace webapi.Infrastructure.Repositories
 
             await _dbContext.Messages.AddAsync(dbe);
 
+            UserDBE? userDBE = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == message.UserId);
+
+            message.Sender = new User
+            {
+                Id = userDBE?.Id ?? Guid.Empty,
+                Username = userDBE?.Username ?? "",
+                FullName = userDBE?.FullName ?? "",
+            };
+
             return dbe.Id;
         }
 
