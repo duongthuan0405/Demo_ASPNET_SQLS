@@ -1,0 +1,145 @@
+@page "/products"
+@using BlazorDemoApp.Models
+@using BlazorDemoApp.Data
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext DbContext
+@rendermode InteractiveServer
+
+<PageTitle>Quản lý Sản phẩm</PageTitle>
+
+<h1>Quản lý Sản phẩm (Products)</h1>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Mô tả</th>
+                <th>Giá</th>
+                <th>Danh mục</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price.ToString("N0")</td>
+                    <td>@(product.Category?.Name ?? "N/A")</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => Edit(product)">Sửa</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(product.Id)">Xóa</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+    <h3>@(isEditMode ? "Sửa Sản phẩm" : "Thêm Sản phẩm")</h3>
+    <EditForm Model="currentProduct" OnValidSubmit="SaveProduct">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Tên sản phẩm:</label>
+            <InputText class="form-control" @bind-Value="currentProduct.Name" />
+        </div>
+        <div class="mb-3">
+            <label>Mô tả:</label>
+            <InputText class="form-control" @bind-Value="currentProduct.Description" />
+        </div>
+        <div class="mb-3">
+            <label>Giá:</label>
+            <InputNumber class="form-control" @bind-Value="currentProduct.Price" />
+        </div>
+        <div class="mb-3">
+            <label>Danh mục:</label>
+            <InputSelect class="form-control" @bind-Value="currentProduct.CategoryId">
+                <option value="">-- Chọn danh mục --</option>
+                @if (categories != null)
+                {
+                    @foreach (var cat in categories)
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                }
+            </InputSelect>
+        </div>
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Hủy</button>
+    </EditForm>
+}
+
+@code {
+    private List<Product>? products;
+    private List<Category>? categories;
+    private Product currentProduct = new Product();
+    private bool isEditMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        products = await DbContext.Products.Include(p => p.Category).AsNoTracking().ToListAsync();
+        categories = await DbContext.Categories.AsNoTracking().ToListAsync();
+    }
+
+    private async Task SaveProduct()
+    {
+        if (isEditMode)
+        {
+            DbContext.Products.Update(currentProduct);
+        }
+        else
+        {
+            DbContext.Products.Add(currentProduct);
+        }
+        await DbContext.SaveChangesAsync();
+        currentProduct = new Product();
+        isEditMode = false;
+        await LoadData();
+    }
+
+    private void Edit(Product product)
+    {
+        currentProduct = new Product
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            CategoryId = product.CategoryId
+        };
+        isEditMode = true;
+    }
+
+    private async Task Delete(int id)
+    {
+        var product = await DbContext.Products.FindAsync(id);
+        if (product != null)
+        {
+            DbContext.Products.Remove(product);
+            await DbContext.SaveChangesAsync();
+            await LoadData();
+        }
+    }
+
+    private void CancelEdit()
+    {
+        currentProduct = new Product();
+        isEditMode = false;
+    }
+}

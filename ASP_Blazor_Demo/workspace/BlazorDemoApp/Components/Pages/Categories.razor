@@ -1,0 +1,120 @@
+@page "/categories"
+@using BlazorDemoApp.Models
+@using BlazorDemoApp.Data
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext DbContext
+@rendermode InteractiveServer
+
+<PageTitle>Quản lý Danh mục</PageTitle>
+
+<h1>Quản lý Danh mục (Categories)</h1>
+
+@if (categories == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Mô tả</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in categories)
+            {
+                <tr>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td>@category.Description</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => Edit(category)">Sửa</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(category.Id)">Xóa</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+    <h3>@(isEditMode ? "Sửa Danh mục" : "Thêm Danh mục")</h3>
+    <EditForm Model="currentCategory" OnValidSubmit="SaveCategory">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Tên danh mục:</label>
+            <InputText class="form-control" @bind-Value="currentCategory.Name" />
+        </div>
+        <div class="mb-3">
+            <label>Mô tả:</label>
+            <InputText class="form-control" @bind-Value="currentCategory.Description" />
+        </div>
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Hủy</button>
+    </EditForm>
+}
+
+@code {
+    private List<Category>? categories;
+    private Category currentCategory = new Category();
+    private bool isEditMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        categories = await DbContext.Categories.AsNoTracking().ToListAsync();
+    }
+
+    private async Task SaveCategory()
+    {
+        if (isEditMode)
+        {
+            DbContext.Categories.Update(currentCategory);
+        }
+        else
+        {
+            DbContext.Categories.Add(currentCategory);
+        }
+        await DbContext.SaveChangesAsync();
+        currentCategory = new Category();
+        isEditMode = false;
+        await LoadCategories();
+    }
+
+    private void Edit(Category category)
+    {
+        currentCategory = new Category
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description
+        };
+        isEditMode = true;
+    }
+
+    private async Task Delete(int id)
+    {
+        var category = await DbContext.Categories.FindAsync(id);
+        if (category != null)
+        {
+            DbContext.Categories.Remove(category);
+            await DbContext.SaveChangesAsync();
+            await LoadCategories();
+        }
+    }
+
+    private void CancelEdit()
+    {
+        currentCategory = new Category();
+        isEditMode = false;
+    }
+}

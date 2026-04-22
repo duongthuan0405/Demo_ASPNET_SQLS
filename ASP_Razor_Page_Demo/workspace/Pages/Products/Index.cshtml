@@ -1,0 +1,32 @@
+@page
+@model workspace.Pages.Products.IndexModel
+
+<h1>Danh sách Product</h1>
+<p>
+    <a asp-page="Create" class="btn btn-primary">Thêm mới</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Mô tả</th>
+            <th>Giá</th>
+            <th>Category</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Product) {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Description</td>
+            <td>@item.Price</td>
+            <td>@item.Category?.Name</td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Sửa</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
